@@ -10,14 +10,15 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class GPAhelper {
-	private static String websiteText;
-	private static String[] dividedText;
+	private static String websiteText; //string of the entire data from  http://waf.cs.illinois.edu/discovery/gpa_of_every_course_at_illinois/
+	private static String[] dividedText; //array of sections from main string
+	private static int overallGPA; //overall GPA for a student
 	
 	/**
-	 * Divides the single string from the generic.json into a String array of classes.
+	 * Divides the single string from the generic.json into a String array of classes by title.
 	 * @param text
 	 */
-	public static void textDivider(String text) { //new commit 
+	public static void textDivider(String text) { 
 		dividedText = text.split("title");
 	}
 	
@@ -38,28 +39,78 @@ public class GPAhelper {
 		return index;
 	}
 	
-	public static void printAvgGPA(int courseIndex) {
-		String[] lineSplitter = dividedText[courseIndex].split(",");
+	/**
+	 * method that prints the average GPA of a course. 
+	 * @param courseIndex
+	 */
+	public static double printAvgGPA(int courseIndex) {
+		String[] courseElement = dividedText[courseIndex].split(",");
 		double wantedGPA = 0.0;
-		for (int i = 0; i < lineSplitter.length; i++) {
+		for (int i = 0; i < courseElement.length; i++) {
 			//System.out.println(lineSplitter[i]);
-			if (lineSplitter[i].contains("avg_gpa")) {
-				String[] littleSplitter = lineSplitter[i].split(": ");
-				wantedGPA = Double.parseDouble(littleSplitter[littleSplitter.length - 1]);
-			}
-				
+			if (courseElement[i].contains("avg_gpa")) {
+				String[] gpaElement = courseElement[i].split(": ");
+				wantedGPA = Double.parseDouble(gpaElement[gpaElement.length - 1]);
+			}				
 		}
-		System.out.println(wantedGPA);
+		if (wantedGPA == 0.0) {
+			System.out.print("Invalid input. Please try again");
+		} else {
+			System.out.println(wantedGPA);
+		}	
+		return wantedGPA;
 	}
 	
+	/**
+	 * Checks for valid user input. 
+	 * @param input
+	 * @return
+	 */
 	public static boolean isGoodInput(String input) {
-		String[] badInput = input.split("[^A-Za-z0-9\\s]");
-		if (badInput.length > 1) {
-			System.out.println("Please only use alphanumeric characters (A-Z and 0-9)");
+		isValidInput(input);
+		//String[] badInput = input.split("[^A-Za-z0-9\\s]");
+		if (!websiteText.contains(input)) {
+			System.out.print("Course can't be found. Please try again");
 			return false;
+		} else {
+			//String[] badInput = input.split("[^A-Za-z0-9\\s]");		
+			if (input.contains("[!@#$%&*()_+=|<>?{}\\[\\]~-]")) {
+				System.out.println("Please only use alphanumeric characters (A-Z and 0-9)");
+				return false;
+			}			
 		}
 		return true;
 	}
+	/**
+	 * Checks to see if course input is an actual course offered. 
+	 * @param input
+	 * @return
+	 */
+	public static boolean isValidInput(String input) {
+		if (!websiteText.contains(input)) {
+			return false; 
+		} 
+		return true;
+	}
+	/**
+	 * Compares user's GPA for a particular class with the average GPA for that class.
+	 * @param input
+	 * @return
+	 */
+	public static double compares(String input) {
+		int courseIndex = classIndexFinder(input);
+		double avgGPA = printAvgGPA(courseIndex);
+		System.out.println("Enter your gpa for the course");
+        Scanner scan = new Scanner(System.in);
+        Double yourGPA = scan.nextDouble();
+        scan.close();
+        double gpaDifference = Math.abs(yourGPA - avgGPA);
+        return gpaDifference;
+	}
+	/*public static double comparesOverallGpa(String input) {
+		
+	}*/ //requires credit hours to determine total GPA
+	
 
     public static void main(String[] args) throws IOException {
 
@@ -99,7 +150,7 @@ public class GPAhelper {
         
         //This block sets up the course you'd like to look up
         boolean goodInput = false;
-        while (!goodInput) {
+        while (!goodInput && isValidInput(inputCourse)) {
 	        try {
 		        System.out.println("Please enter desired course in \"department, course number\" format");
 		        System.out.println("Example: BIOE 420");
@@ -107,9 +158,9 @@ public class GPAhelper {
 		        inputCourse = sc.nextLine();
 		        inputCourse = inputCourse.toUpperCase();
 		        sc.close();
-		        Pattern p = Pattern.compile("[^a-zA-Z0-9\\s]");
+		        Pattern p = Pattern.compile("[^a-zA-Z0-9\\s]"); //used to check for special characters 
 		        goodInput = !p.matcher(inputCourse).find();
-		        System.out.println(goodInput);
+		        //System.out.println(goodInput);
 		        //goodInput = isGoodInput(inputCourse);
 	        } catch (Exception e) {
 	        	throw new NoSuchElementException("Incorrect" + e);
