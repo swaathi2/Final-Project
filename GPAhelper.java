@@ -4,10 +4,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.InvalidParameterException;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.regex.Pattern;
 
 public class GPAhelper {
 	private static String websiteText; //string of the entire data from  http://waf.cs.illinois.edu/discovery/gpa_of_every_course_at_illinois/
@@ -29,6 +26,7 @@ public class GPAhelper {
 	 */
 	public static int classIndexFinder(String inputCourse) {
 		int index = 0;
+		inputCourse.toUpperCase();
 		for (int i = 0; i < dividedText.length; i++) {
 			//System.out.println(dividedText[i]);
 			if (dividedText[i].contains(inputCourse)) {
@@ -56,7 +54,7 @@ public class GPAhelper {
 		if (wantedGPA == 0.0) {
 			System.out.print("Invalid input. Please try again");
 		} else {
-			System.out.println(wantedGPA);
+			System.out.println("Average GPA: " + wantedGPA);
 		}	
 		return wantedGPA;
 	}
@@ -81,6 +79,7 @@ public class GPAhelper {
 		}
 		return true;
 	}
+	
 	/**
 	 * Checks to see if course input is an actual course offered. 
 	 * @param input
@@ -97,26 +96,27 @@ public class GPAhelper {
 	 * @param input
 	 * @return
 	 */
-	public static double compares(String input) {
-		int courseIndex = classIndexFinder(input);
-		double avgGPA = printAvgGPA(courseIndex);
-		System.out.println("Enter your gpa for the course");
+	public static void compares() {
+		String input = "";
+		System.out.println("Would you like to know the GPA of this course?");
+		System.out.println("Type \"yes\" or \"no\"");
         Scanner scan = new Scanner(System.in);
-        Double yourGPA = scan.nextDouble();
-        scan.close();
-        double gpaDifference = Math.abs(yourGPA - avgGPA);
-        return gpaDifference;
+        input = scan.nextLine();
+        input = input.toUpperCase();
+        if (input.equals("YES")) {
+        	int courseIndex = classIndexFinder(Student.getLastClass());
+			double avgGPA = printAvgGPA(courseIndex);
+			double yourGPA = Student.getLastGPA();
+			System.out.println("Your GPA: " + yourGPA);
+        }
+        if (input.equals("NO")) {
+        	System.out.println("Lame");
+        }     
 	}
-	/*public static double comparesOverallGpa(String input) {
-		
-	}*/ //requires credit hours to determine total GPA
 	
-
-    public static void main(String[] args) throws IOException {
-
-        // Make a URL to the web page
+	public static void createData() throws IOException {
+		// Make a URL to the web page
         URL url = new URL("http://waf.cs.illinois.edu/discovery/gpa_of_every_course_at_illinois/generic.json");
-        //URL url = new URL("http://catalog.illinois.edu/undergraduate/business/departments/accy/#courseinventory");
 
         // Get the input stream through URL Connection
         URLConnection con = url.openConnection();
@@ -141,39 +141,40 @@ public class GPAhelper {
         	websiteText = line;
             //System.out.println(line);
         }
-        
-        //System.out.println(websiteText);
-        
+                
         textDivider(websiteText);
+	}
+	
+
+    public static void main() {
         
         String inputCourse = "";
         
         //This block sets up the course you'd like to look up
-        boolean goodInput = false;
-        while (!goodInput && isValidInput(inputCourse)) {
-	        try {
-		        System.out.println("Please enter desired course in \"department, course number\" format");
+        //boolean goodInput = false;
+        //while (!goodInput && isValidInput(inputCourse)) {
+	        //try {
+		        System.out.println("Please enter desired course in \"department course-number\" format");
 		        System.out.println("Example: BIOE 420");
 		        Scanner sc = new Scanner(System.in);
 		        inputCourse = sc.nextLine();
 		        inputCourse = inputCourse.toUpperCase();
-		        sc.close();
-		        Pattern p = Pattern.compile("[^a-zA-Z0-9\\s]"); //used to check for special characters 
-		        goodInput = !p.matcher(inputCourse).find();
+		        //sc.close();
+		        //Pattern p = Pattern.compile("[^a-zA-Z0-9\\s]"); //used to check for special characters 
+		        //goodInput = !p.matcher(inputCourse).find();
 		        //System.out.println(goodInput);
 		        //goodInput = isGoodInput(inputCourse);
-	        } catch (Exception e) {
-	        	throw new NoSuchElementException("Incorrect" + e);
-	        }
-        }
+	        //} catch (Exception e) {
+	        //	throw new NoSuchElementException("Incorrect" + e);
+	       // }
+        //}
         
         //find the index of a desired class.     
         int index;
         index = classIndexFinder(inputCourse);
-        
-        //System.out.println(index + " " + dividedText[index]);
-        
+                
         printAvgGPA(index);
         
     }
 }
+

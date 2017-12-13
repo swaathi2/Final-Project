@@ -1,49 +1,37 @@
-/**
- * 
- * Student class holds all the courses and their respective GPA's for a particular student 
- *  
- */
+import java.util.Scanner;
+
 public class Student {
 
-	private static int[] gpas = new int[0]; // integer array that holds all GPA's a particular student
-	private static String[] courses = new String[0]; //String array that holds all courses of a particular student
-	private String course;
-	private int GPA;
+	private static double[] gpas;
+	private static String[] courses;
+	
 	/**
 	 * Default constructor for the student class. Need to initialize arrays to import courses
 	 * and their respective classes.
 	 */
-	public Student() { //empty constructor 
-		//gpas = new int[0];
-		//courses = new String[0];
+	public Student() {
+		gpas = new double[0];
+		courses = new String[0];
 	}
-	/**
-	 * Initialize a new course 
-	 * @param setCourse
-	 */
-	public void setCourse(String course) {
-		this.course = course;
+	
+	public static double getLastGPA() {
+		return gpas[gpas.length - 1];
 	}
-	/**
-	 * Initialize the corresponding GPA for the course
-	 * @param GPA
-	 */
-	public void setGPA(int GPA) {
-		this.GPA = GPA;
+	
+	public static String getLastClass() {
+		return courses[courses.length - 1];
 	}
-	/**
-	 * get the course. 
-	 * @return course
-	 */
-	public String getCourse() {
-		return course;
-	}
-	/**
-	 * get the GPA. 
-	 * @return GPA
-	 */
-	public int getGPA() {
-		return GPA;
+	
+	public static void getCourseGPA() {
+		System.out.println("Input a course that you have entered.");
+		String wantCourse = "";
+		Scanner sc2 = new Scanner(System.in);
+		wantCourse = sc2.nextLine();
+		wantCourse = wantCourse.toUpperCase();
+		for (int i = 0; i < courses.length; i++) {
+			if (wantCourse.equals(courses[i]))
+				System.out.println("Your GPA in that class was " + gpas[i]);
+		}
 	}
 	
 	/**
@@ -53,25 +41,39 @@ public class Student {
 	 * @param setCourse the additional course to be added
 	 * @param setGPA the associated received GPA with that course
 	 */
-	public void addCourse(final String newCourse, final int newGPA) {
+	public void addCourse() {
+		String setCourse = "";
+		System.out.println("Please enter a course you have taken");
+        Scanner sc = new Scanner(System.in);
+        setCourse = sc.nextLine();
+        setCourse = setCourse.toUpperCase();
 		//Adding a new course to the Student
-		String[] tempCourses = new String[courses.length + 1]; //creates a new string array for courses
-		this.course = newCourse;
-		tempCourses[tempCourses.length] = newCourse; //puts the new course as the last element of the array
-		if (courses.length > 0) {
-			for (int i = 0; i < courses.length; i++) { //adds old courses to newly created array
+		String[] tempCourses = new String[courses.length + 1];
+		tempCourses[tempCourses.length - 1] = setCourse;
+		if (courses.length >= 0) {
+			for(int i = 0; i < courses.length; i++) {
 				tempCourses[i] = courses[i];
 			}
 		}
+		courses = tempCourses;
 		
+		
+		double setGPA = 0.0;
+		System.out.println("Please enter your GPA for that course");
+        Scanner scGPA = new Scanner(System.in);
+        setGPA = scGPA.nextDouble();
 		//Adding the associated gpa
-		int[] tempGPAS = new int[gpas.length + 1];
-		this.GPA = newGPA; 
-		tempGPAS[tempGPAS.length] = newGPA;
-		if (gpas.length > 0) {
-			for (int i = 0; i < gpas.length; i++) {
+		double[] tempGPAS = new double[gpas.length + 1];
+		tempGPAS[tempGPAS.length - 1] = setGPA;
+		if (gpas.length >= 0) {
+			for(int i = 0; i < gpas.length; i++) {
 				tempGPAS[i] = gpas[i];
 			}
 		}
+		gpas = tempGPAS;
+
+		GPAhelper.compares();
 	}
 }
+
+
